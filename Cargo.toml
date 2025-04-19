@@ -1,0 +1,3 @@
+[workspace]
+members = ["apex-core"]
+resolver = "2"

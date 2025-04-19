@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build and Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly-2025-04-26
+          override: true
+          # components: clippy, rustfmt
+          components: rustfmt
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Show Rust version
+        run: rustc --version --verbose
+
+      - name: Build
+        run: cargo build --workspace --all-targets --release
+
+      - name: Run cargo check
+        run: cargo check --workspace --all-targets
+
+      - name: Run cargo fmt check
+        run: cargo fmt --all -- --check
+
+      - name: Run cargo test
+        run: cargo test --workspace --all-targets --no-fail-fast
+
+      # - name: Run cargo clippy
+      #   run: cargo clippy --workspace --all-targets -- -D warnings
