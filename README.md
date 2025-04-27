@@ -4,7 +4,7 @@
 > trading systems and scalable exchange infrastructures.  
 > **Reach the Apex of Matching Performance.**
 
-> **Requires Rust 1.88 stable.**
+> **Requires Rust 1.86 stable.**
 
 [![Build Status](https://github.com/crypto-zero/apex-engine/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/crypto-zero/apex-engine/actions)
 [![License: MIT/Apache-2.0](https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue)](#-license)
