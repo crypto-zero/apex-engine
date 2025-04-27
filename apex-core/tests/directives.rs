@@ -1,15 +1,14 @@
-#![feature(integer_atomics)]
 mod common;
 
 use crate::common::*;
 use apex_core::prelude::*;
 use std::sync::Arc;
-use std::sync::atomic::AtomicU128;
+use std::sync::atomic::AtomicU64;
 
 #[test]
 fn test_maker_only_skip_match_when_cross() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -34,7 +33,7 @@ fn test_maker_only_skip_match_when_cross() {
 #[test]
 fn test_maker_only_hangs_when_no_cross() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -54,7 +53,7 @@ fn test_maker_only_hangs_when_no_cross() {
 #[test]
 fn test_taker_only_match_when_cross() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -89,7 +88,7 @@ fn test_taker_only_match_when_cross() {
 #[test]
 fn test_taker_only_stays_when_no_cross() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 

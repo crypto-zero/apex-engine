@@ -1,11 +1,10 @@
-#![feature(integer_atomics)]
 mod common;
 use apex_core::prelude::*;
 use common::*;
 use criterion::{Criterion, Throughput, criterion_group, criterion_main};
 use rand::Rng;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, AtomicU64, AtomicU128, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::thread;
 
 fn bench_matching(c: &mut Criterion) {
@@ -13,7 +12,7 @@ fn bench_matching(c: &mut Criterion) {
     group.throughput(Throughput::Elements(10_000));
     group.bench_function("match_orders 10k", |b| {
         let syncer = Arc::new(EmptyOrderBookSyncer {});
-        let id = Arc::new(AtomicU128::new(1));
+        let id = Arc::new(AtomicU64::new(1));
         let book = Arc::new(DefaultOrderBook::new(id, syncer));
         let engine = DefaultMatchingEngine::new(book);
 
@@ -38,7 +37,7 @@ fn bench_matching(c: &mut Criterion) {
 
 fn stress_multi_thread_benchmark(c: &mut Criterion) {
     let syncer: Arc<dyn OrderBookSyncer> = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = Arc::new(DefaultMatchingEngine::new(book));
 

@@ -1,16 +1,15 @@
-#![feature(integer_atomics)]
 mod common;
 
 use crate::common::*;
 use apex_core::prelude::*;
 use rand::Rng;
 use std::sync::Arc;
-use std::sync::atomic::AtomicU128;
+use std::sync::atomic::AtomicU64;
 
 #[test]
 fn test_massive_order_insertion() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -26,7 +25,7 @@ fn test_massive_order_insertion() {
 #[test]
 fn test_massive_order_cancellation() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book);
 
@@ -48,7 +47,7 @@ fn test_massive_order_cancellation() {
 #[test]
 fn test_massive_order_matching() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book);
 

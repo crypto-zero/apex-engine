@@ -4,7 +4,7 @@ use crossbeam::epoch::default_collector;
 use crossbeam_skiplist::SkipList;
 use flurry::HashMap;
 use std::sync::Arc;
-use std::sync::atomic::{AtomicU128, Ordering};
+use std::sync::atomic::{AtomicU64, Ordering};
 
 /// OrderBook is a trait for order book
 pub trait OrderBook {
@@ -101,7 +101,7 @@ pub trait OrderBookWalker: Send + Sync + OrderBook + MatchingEngineWalker {}
 
 /// DefaultOrderBook is the default implementation of the order book
 pub struct DefaultOrderBook {
-    id: Arc<AtomicU128>,
+    id: Arc<AtomicU64>,
     syncer: Arc<dyn OrderBookSyncer>,
     // By order time in microseconds
     market_orders: SkipList<Priority, Order>,
@@ -115,7 +115,7 @@ pub struct DefaultOrderBook {
 
 impl DefaultOrderBook {
     /// Creates a new order book
-    pub fn new(id: Arc<AtomicU128>, syncer: Arc<dyn OrderBookSyncer>) -> Self {
+    pub fn new(id: Arc<AtomicU64>, syncer: Arc<dyn OrderBookSyncer>) -> Self {
         let collector = default_collector().clone();
         let market_orders = SkipList::new(collector.clone());
         let buy_orders = SkipList::new(collector.clone());

@@ -1,12 +1,14 @@
 # ⚡ ApexEngine - High-Performance Matching Engine
 
-> **ApexEngine** is a next-generation, high-performance, lock-free matching engine, designed for ultra-low latency trading systems and scalable exchange infrastructures.  
+> **ApexEngine** is a next-generation, high-performance, lock-free matching engine, designed for ultra-low latency
+> trading systems and scalable exchange infrastructures.  
 > **Reach the Apex of Matching Performance.**
 
-> **Requires Rust 1.88 nightly.**
+> **Requires Rust 1.88 stable.**
 
+[![Build Status](https://github.com/crypto-zero/apex-engine/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/crypto-zero/apex-engine/actions)
 [![License: MIT/Apache-2.0](https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue)](#-license)
-[![Rust Version](https://img.shields.io/badge/rust-1.88%20nightly-orange)](https://www.rust-lang.org/)
+[![Rust Version](https://img.shields.io/badge/rust-1.88%20stable-orange)](https://www.rust-lang.org/)
 
 ---
 
@@ -60,7 +62,7 @@ let book = Arc::new(DefaultOrderBook::new(id, syncer));
 let engine = DefaultMatchingEngine::new(book);
 
 let mut order = make_limit_order(1, Side::Buy, 1000, 10, 1000000);
-engine.create_order(&mut order).unwrap();
+engine.create_order( & mut order).unwrap();
 
 engine.match_orders();
 ```
@@ -89,7 +91,8 @@ engine.match_orders();
 # 🛎️ Why ApexEngine?
 
 Because every microsecond matters.  
-ApexEngine is engineered for ultra-high performance, deterministic matching, and scalable concurrency — **without sacrificing safety**.
+ApexEngine is engineered for ultra-high performance, deterministic matching, and scalable concurrency — **without
+sacrificing safety**.
 
 ---
 

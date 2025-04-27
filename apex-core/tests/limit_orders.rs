@@ -1,16 +1,15 @@
-#![feature(integer_atomics)]
 mod common;
 
 use crate::common::*;
 use apex_core::prelude::*;
 use crossbeam::epoch;
 use std::sync::Arc;
-use std::sync::atomic::AtomicU128;
+use std::sync::atomic::AtomicU64;
 
 #[test]
 fn test_limit_order_full_fill_removal() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -33,7 +32,7 @@ fn test_limit_order_full_fill_removal() {
 #[test]
 fn test_limit_order_priority_by_time() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -58,7 +57,7 @@ fn test_limit_order_priority_by_time() {
 #[test]
 fn test_limit_order_no_cross_no_fill() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -88,7 +87,7 @@ fn test_limit_order_no_cross_no_fill() {
 #[test]
 fn test_limit_order_multiple_partial_fills() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -121,7 +120,7 @@ fn test_limit_order_multiple_partial_fills() {
 #[test]
 fn test_limit_order_partial_then_cancel() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -153,7 +152,7 @@ fn test_limit_order_partial_then_cancel() {
 #[test]
 fn test_limit_order_partial_and_full_match() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -187,7 +186,7 @@ fn test_limit_order_partial_and_full_match() {
 #[test]
 fn test_limit_order_iter_continues_after_remove() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 

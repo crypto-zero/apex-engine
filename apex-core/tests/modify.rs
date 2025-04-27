@@ -1,16 +1,15 @@
-#![feature(integer_atomics)]
 mod common;
 
 use crate::common::*;
 use apex_core::prelude::*;
 use crossbeam::epoch;
 use std::sync::Arc;
-use std::sync::atomic::AtomicU128;
+use std::sync::atomic::AtomicU64;
 
 #[test]
 fn test_cancel_active_limit_order() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -32,7 +31,7 @@ fn test_cancel_active_limit_order() {
 #[test]
 fn test_update_active_order_price() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -50,7 +49,7 @@ fn test_update_active_order_price() {
 #[test]
 fn test_update_order_priority_after_price_change() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -71,7 +70,7 @@ fn test_update_order_priority_after_price_change() {
 #[test]
 fn test_update_nonexistent_order_should_fail() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book);
 
@@ -82,7 +81,7 @@ fn test_update_nonexistent_order_should_fail() {
 #[test]
 fn test_update_filled_order_should_fail() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book);
 
@@ -99,7 +98,7 @@ fn test_update_filled_order_should_fail() {
 #[test]
 fn test_cancel_partially_filled_limit_order() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -127,7 +126,7 @@ fn test_cancel_partially_filled_limit_order() {
 #[test]
 fn test_cancel_updates_status_and_reason() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -150,7 +149,7 @@ fn test_cancel_updates_status_and_reason() {
 #[test]
 fn test_cancelled_order_not_in_book() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 

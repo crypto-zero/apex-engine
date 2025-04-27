@@ -1,5 +1,3 @@
-#![feature(integer_atomics)]
-
 use apex_core::prelude::*;
 use crossbeam::epoch;
 use crossbeam::epoch::default_collector;

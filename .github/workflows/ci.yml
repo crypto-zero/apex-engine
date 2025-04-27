@@ -20,8 +20,7 @@ jobs:
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: nightly-2025-04-26
-          override: true
+          toolchain: 1.88.0
           # components: clippy, rustfmt
           components: rustfmt
 

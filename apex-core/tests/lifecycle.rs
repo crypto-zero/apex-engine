@@ -1,16 +1,15 @@
-#![feature(integer_atomics)]
 mod common;
 
 use crate::common::*;
 use apex_core::prelude::*;
 use crossbeam::epoch;
 use std::sync::Arc;
-use std::sync::atomic::AtomicU128;
+use std::sync::atomic::AtomicU64;
 
 #[test]
 fn test_lifecycle_initial_state_active() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book);
 
@@ -26,7 +25,7 @@ fn test_lifecycle_initial_state_active() {
 #[test]
 fn test_lifecycle_transition_to_matched() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -56,7 +55,7 @@ fn test_lifecycle_transition_to_matched() {
 #[test]
 fn test_lifecycle_transition_to_finished_after_full_fill() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
@@ -84,7 +83,7 @@ fn test_lifecycle_transition_to_finished_after_full_fill() {
 #[test]
 fn test_lifecycle_transition_to_finished_after_cancel() {
     let syncer = Arc::new(EmptyOrderBookSyncer {});
-    let id = Arc::new(AtomicU128::new(1));
+    let id = Arc::new(AtomicU64::new(1));
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book.clone());
 
