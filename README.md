@@ -8,7 +8,7 @@
 
 [![Build Status](https://github.com/crypto-zero/apex-engine/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/crypto-zero/apex-engine/actions)
 [![License: MIT/Apache-2.0](https://img.shields.io/badge/license-MIT%20%2F%20Apache--2.0-blue)](#-license)
-[![Rust Version](https://img.shields.io/badge/rust-1.88%20stable-orange)](https://www.rust-lang.org/)
+[![Rust Version](https://img.shields.io/badge/rust-1.86%20stable-orange)](https://www.rust-lang.org/)
 
 ---
 
