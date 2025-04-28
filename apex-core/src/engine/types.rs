@@ -13,11 +13,11 @@ static GLOBAL: MiMalloc = MiMalloc;
 pub type OrderID = u64;
 
 /// Price is the type used for prices in the order.
-/// This is a 64-bit unsigned integer.
+/// This is a 256-bit unsigned integer.
 pub type Price = U256;
 
 /// Quantity is the type used for quantities in the order.
-/// This is a 64-bit unsigned integer.
+/// This is a 256-bit unsigned integer.
 pub type Quantity = U256;
 
 /// Priority is that the order book uses to determine the order priority.
