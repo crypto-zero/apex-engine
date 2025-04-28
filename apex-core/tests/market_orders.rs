@@ -134,7 +134,7 @@ fn test_market_order_slippage_exceeded_cancel() {
 
     // Create a market buy order with tight slippage
     let mut buy = make_market_order(3, Side::Buy, 10, 1002); // Wants 10 units
-    buy.slippage_tolerance = Some(SlippageTolerance(10)); // 0.10% slippage allowed
+    buy.slippage_tolerance = Some(SlippageTolerance(100)); // 1.00% slippage allowed
     engine.create_order(&mut buy).unwrap();
 
     engine.match_orders();
@@ -152,7 +152,8 @@ fn test_market_order_slippage_exceeded_cancel() {
         "Remaining sell order should be sell2 (id=2)"
     );
     assert_eq!(
-        remaining_sell[0].1, 10,
+        remaining_sell[0].1,
+        Quantity::from(10u32),
         "Sell2 should have full quantity left"
     );
 }

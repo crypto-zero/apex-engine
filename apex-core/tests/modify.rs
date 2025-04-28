@@ -38,7 +38,9 @@ fn test_update_active_order_price() {
     let mut buy = make_limit_order(1, Side::Buy, 100, 10, 1000);
     engine.create_order(&mut buy).unwrap();
 
-    engine.update_order(buy.id, 105, 1001).unwrap();
+    engine
+        .update_order(buy.id, Price::from(105u64), 1001)
+        .unwrap();
 
     let guard = &epoch::pin();
     let buy_book = book.get_book(Side::Buy);
@@ -58,7 +60,9 @@ fn test_update_order_priority_after_price_change() {
     engine.create_order(&mut buy1).unwrap();
     engine.create_order(&mut buy2).unwrap();
 
-    engine.update_order(buy1.id, 101, 1002).unwrap();
+    engine
+        .update_order(buy1.id, Price::from(101u64), 1002)
+        .unwrap();
 
     let state = get_book_state(book.as_ref(), Side::Buy);
     assert_eq!(
@@ -74,7 +78,7 @@ fn test_update_nonexistent_order_should_fail() {
     let book = Arc::new(DefaultOrderBook::new(id, syncer));
     let engine = DefaultMatchingEngine::new(book);
 
-    let result = engine.update_order(999, 105, 1001);
+    let result = engine.update_order(999, Price::from(105u64), 1001);
     assert!(result.is_err(), "Updating nonexistent order should fail");
 }
 
@@ -91,7 +95,7 @@ fn test_update_filled_order_should_fail() {
     engine.create_order(&mut buy).unwrap();
     engine.match_orders();
 
-    let result = engine.update_order(sell.id, 95, 1002);
+    let result = engine.update_order(sell.id, Price::from(95u64), 1002);
     assert!(result.is_err(), "Updating filled order should fail");
 }
 

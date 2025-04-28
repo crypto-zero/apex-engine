@@ -112,7 +112,7 @@ fn test_limit_order_multiple_partial_fills() {
     );
     assert_eq!(
         remaining_sell[0],
-        (2, 2),
+        (2, Quantity::from(2u32)),
         "Sell2 should have 2 remaining units"
     );
 }
@@ -179,8 +179,8 @@ fn test_limit_order_partial_and_full_match() {
         .collect();
 
     assert_eq!(remaining.len(), 2);
-    assert_eq!(remaining[0], (101, 4));
-    assert_eq!(remaining[1], (102, 10));
+    assert_eq!(remaining[0], (101, Quantity::from(4u32)));
+    assert_eq!(remaining[1], (102, Quantity::from(10u32)));
 }
 
 #[test]
@@ -216,6 +216,6 @@ fn test_limit_order_iter_continues_after_remove() {
         .collect();
 
     assert_eq!(remaining.len(), 2);
-    assert_eq!(remaining[0], (102, 5));
-    assert_eq!(remaining[1], (103, 10));
+    assert_eq!(remaining[0], (102, Quantity::from(5u32)));
+    assert_eq!(remaining[1], (103, Quantity::from(10u32)));
 }

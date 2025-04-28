@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use crypto_bigint::Zero;
 use std::sync::Arc;
 use std::time::Instant;
 
@@ -72,10 +73,10 @@ impl DefaultMatchingEngine {
                 return WalkingResult::next();
             }
 
-            remaining_qty = remaining_qty.saturating_sub(maker.quantity());
+            remaining_qty = remaining_qty.saturating_sub(&maker.quantity());
             order_id_list.push(maker.id);
 
-            if remaining_qty == 0 {
+            if remaining_qty.is_zero().into() {
                 WalkingResult::exit()
             } else {
                 WalkingResult::next()
@@ -85,7 +86,7 @@ impl DefaultMatchingEngine {
         self.order_book
             .walking_book_maker(Side::Sell, slippage_price, &mut walking);
 
-        if remaining_qty == 0 {
+        if remaining_qty.is_zero().into() {
             return Some(order_id_list);
         }
 
@@ -117,7 +118,7 @@ impl DefaultMatchingEngine {
         let mut process = |maker: &Order| {
             let removed =
                 DefaultMatchingEngine::process_order_pair(taker, maker, &mut updated, &mut matched);
-            WalkingResult::new(removed, taker.quantity() == 0)
+            WalkingResult::new(removed, taker.quantity().is_zero().into())
         };
         self.order_book
             .walking_by_order_id_list(order_id_list_opt.unwrap().as_slice(), &mut process);
@@ -158,7 +159,7 @@ impl DefaultMatchingEngine {
             }
             let removed =
                 DefaultMatchingEngine::process_order_pair(taker, maker, &mut updated, &mut matched);
-            WalkingResult::new(removed, taker.quantity() == 0)
+            WalkingResult::new(removed, taker.quantity().is_zero().into())
         };
         self.order_book
             .walking_book_maker(opposite_side, slippage_price, &mut process);
@@ -193,7 +194,7 @@ impl DefaultMatchingEngine {
             }
             let removed =
                 DefaultMatchingEngine::process_order_pair(taker, maker, &mut updated, &mut matched);
-            WalkingResult::new(removed, taker.quantity() == 0)
+            WalkingResult::new(removed, taker.quantity().is_zero().into())
         };
         self.order_book
             .walking_book_maker(opposite_side, Some(taker.price), &mut process);
