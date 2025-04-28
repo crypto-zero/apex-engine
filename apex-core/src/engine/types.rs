@@ -1,5 +1,7 @@
+use crypto_bigint::{Limb, NonZero, Reciprocal, U256, U512, Zero};
 use mimalloc::MiMalloc;
 use std::cell::UnsafeCell;
+use std::ops::Mul;
 use std::sync::atomic::{AtomicU8, Ordering};
 
 /// Global allocator
@@ -12,11 +14,11 @@ pub type OrderID = u64;
 
 /// Price is the type used for prices in the order.
 /// This is a 64-bit unsigned integer.
-pub type Price = u64;
+pub type Price = U256;
 
 /// Quantity is the type used for quantities in the order.
 /// This is a 64-bit unsigned integer.
-pub type Quantity = u64;
+pub type Quantity = U256;
 
 /// Priority is that the order book uses to determine the order priority.
 pub type Priority = u64;
@@ -166,7 +168,10 @@ pub struct SlippageTolerance(pub u32);
 
 /// Maximum slippage tolerance allowed.
 /// This is set to 50% (5000 bps).
-pub const MAX_SLIPPAGE_TOLERANCE: SlippageTolerance = SlippageTolerance(5000);
+pub const MAX_ALLOWED_SLIPPAGE_TOLERANCE: SlippageTolerance = SlippageTolerance(5000);
+
+/// a constant used for calculating slippage tolerance.
+const RECIPROCAL_10000: Reciprocal = Reciprocal::new(NonZero::<Limb>::new_unwrap(Limb(10_000u64)));
 
 /// BookKey is a composite key for identifying an order's position in the book.
 /// It combines the order's price, priority (timestamp-based), and side (Buy/Sell).
@@ -308,10 +313,10 @@ impl Default for Order {
             match_strategy: MatchStrategy::default(),
             liquidity_directive: LiquidityDirective::default(),
             time_in_force: TimeInForce::default(),
-            price: 0,
+            price: U256::ZERO,
             slippage_tolerance: None,
-            quantity: UnsafeCell::new(0),
-            filled_quantity: UnsafeCell::new(0),
+            quantity: UnsafeCell::new(U256::ZERO),
+            filled_quantity: UnsafeCell::new(U256::ZERO),
             cancel_reason: UnsafeCell::new(None),
             reject_reason: UnsafeCell::new(None),
             created_at: 0,
@@ -510,12 +515,15 @@ impl Order {
         if self.slippage_tolerance.is_none() {
             return None;
         }
+
         let slippage = self.slippage_tolerance.unwrap();
-        let slippage_bps = slippage.0 as f64 / 10000.0;
-        let slippage_difference = (self.price as f64 * slippage_bps) as u64;
+        let mut factor = U512::from(slippage.0);
+        factor = factor.mul(price);
+        let (quotient, _) = factor.div_rem_limb_with_reciprocal(&RECIPROCAL_10000);
+        let (lo, _) = quotient.split();
         let bound_price = match self.side {
-            Side::Buy => price + slippage_difference,
-            Side::Sell => price - slippage_difference,
+            Side::Buy => price + lo,
+            Side::Sell => price - lo,
         };
         Some(bound_price)
     }
@@ -565,7 +573,7 @@ impl Order {
                 }
                 // 4. SlippageTolerance could be None or a valid value
                 if let Some(slippage) = self.slippage_tolerance {
-                    if slippage.0 > MAX_SLIPPAGE_TOLERANCE.0 {
+                    if slippage.0 > MAX_ALLOWED_SLIPPAGE_TOLERANCE.0 {
                         return Err(OrderValidationError::SlippageExceedsMaximum);
                     }
                 }
@@ -594,19 +602,19 @@ impl Trade {
         let mut maker_quantity = maker.quantity();
         let mut taker_quantity = taker.quantity();
         let traded_quantity = taker_quantity.min(maker_quantity);
-        if traded_quantity == 0 {
+        if traded_quantity.is_zero().into() {
             return None;
         }
 
         maker_quantity = maker.quantity_fill(traded_quantity);
         taker_quantity = taker.quantity_fill(traded_quantity);
 
-        let maker_status = if maker_quantity == 0 {
+        let maker_status = if maker_quantity.is_zero().into() {
             OrderStatus::Filled
         } else {
             OrderStatus::PartiallyFilled
         };
-        let taker_status = if taker_quantity == 0 {
+        let taker_status = if taker_quantity.is_zero().into() {
             OrderStatus::Filled
         } else {
             OrderStatus::PartiallyFilled
