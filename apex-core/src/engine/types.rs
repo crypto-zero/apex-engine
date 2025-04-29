@@ -510,9 +510,7 @@ impl Order {
     /// For 'Sell' orders, the lowest price.
     /// Returns `None` if no slippage tolerance is set.
     pub fn slippage_bound_price(&self, price: Price) -> Option<Price> {
-        self.slippage_tolerance?;
-
-        let slippage = self.slippage_tolerance.unwrap();
+        let slippage = self.slippage_tolerance?;
         let mut factor = U512::from(slippage.0);
         factor = factor.mul(price);
         let (quotient, _) = factor.div_rem_limb_with_reciprocal(&RECIPROCAL_10000);
