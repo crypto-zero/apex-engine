@@ -36,7 +36,7 @@ fn test_massive_order_cancellation() {
 
     // Randomly cancel half of them
     let mut rng = rand::rng();
-    for i in 0..25_000 {
+    for _i in 0..25_000 {
         let id_to_cancel = rng.random_range(0..50_000);
         let _ = engine.cancel_order(id_to_cancel);
     }

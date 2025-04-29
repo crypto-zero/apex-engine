@@ -9,7 +9,7 @@ pub trait OrderBookSyncer: Send + Sync {
     /// This function is called when the order book cancels an order
     fn cancel_order(&self, id: u64, order: &Order);
     /// This function is called when the order engine matches an order
-    fn matched(&self, id: u64, updated: &Vec<Order>, trades: &Vec<Trade>);
+    fn matched(&self, id: u64, updated: &[Order], trades: &[Trade]);
 }
 
 /// EmptyOrderBookSyncer is a no-op implementation of OrderBookSyncer
@@ -22,5 +22,5 @@ impl OrderBookSyncer for EmptyOrderBookSyncer {
 
     fn cancel_order(&self, _id: u64, _order: &Order) {}
 
-    fn matched(&self, _id: u64, _updated: &Vec<Order>, _trades: &Vec<Trade>) {}
+    fn matched(&self, _id: u64, _updated: &[Order], _trades: &[Trade]) {}
 }

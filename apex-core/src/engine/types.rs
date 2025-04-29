@@ -75,7 +75,7 @@ pub enum OrderStatus {
 /// - `Active` → `Finished` (cancellation thread removes order)
 /// - `Matched` → `Active` (matching thread partially fills order)
 /// - `Matched` → `Finished` (matching thread completes order)
-/// So finally state is `Finished`.
+///   So finally state is `Finished`.
 #[derive(PartialEq, Eq, Default, Clone, Copy, Debug)]
 pub enum OrderLifecycle {
     /// The order is live and can be matched or canceled.
@@ -331,7 +331,7 @@ impl Clone for Order {
             id: self.id,
             user_id: self.user_id,
             side: self.side,
-            lifecycle: AtomicU8::new(self.lifecycle.load(Ordering::Acquire).into()),
+            lifecycle: AtomicU8::new(self.lifecycle.load(Ordering::Acquire)),
             order_type: self.order_type,
             status: UnsafeCell::new(unsafe { *self.status.get() }),
             match_strategy: self.match_strategy,
@@ -341,8 +341,8 @@ impl Clone for Order {
             slippage_tolerance: self.slippage_tolerance,
             quantity: UnsafeCell::new(unsafe { *self.quantity.get() }),
             filled_quantity: UnsafeCell::new(unsafe { *self.filled_quantity.get() }),
-            cancel_reason: UnsafeCell::new(unsafe { (*self.cancel_reason.get()).clone() }),
-            reject_reason: UnsafeCell::new(unsafe { (*self.reject_reason.get()).clone() }),
+            cancel_reason: UnsafeCell::new(unsafe { *self.cancel_reason.get() }),
+            reject_reason: UnsafeCell::new(unsafe { *self.reject_reason.get() }),
             created_at: self.created_at,
             updated_at: self.updated_at,
         }
@@ -387,6 +387,7 @@ impl Order {
     }
 
     /// Get the current lifecycle state is `Finished`.
+    #[allow(dead_code)]
     #[inline(always)]
     pub(crate) fn is_finished(&self) -> bool {
         self.lifecycle.load(Ordering::Acquire) == OrderLifecycle::Finished.into()
@@ -402,57 +403,53 @@ impl Order {
     /// Enter matched lifecycle state.
     #[inline(always)]
     pub(crate) fn enter_matched(&self) -> bool {
-        match self.lifecycle.compare_exchange_weak(
-            OrderLifecycle::Active.into(),
-            OrderLifecycle::Matched.into(),
-            Ordering::AcqRel,
-            Ordering::Relaxed,
-        ) {
-            Ok(_) => true,
-            Err(_) => false,
-        }
+        self.lifecycle
+            .compare_exchange_weak(
+                OrderLifecycle::Active.into(),
+                OrderLifecycle::Matched.into(),
+                Ordering::AcqRel,
+                Ordering::Relaxed,
+            )
+            .is_ok()
     }
 
     /// Exit from matched to active lifecycle state.
     #[inline(always)]
     pub(crate) fn exit_matched(&self) -> bool {
-        match self.lifecycle.compare_exchange_weak(
-            OrderLifecycle::Matched.into(),
-            OrderLifecycle::Active.into(),
-            Ordering::AcqRel,
-            Ordering::Relaxed,
-        ) {
-            Ok(_) => true,
-            Err(_) => false,
-        }
+        self.lifecycle
+            .compare_exchange_weak(
+                OrderLifecycle::Matched.into(),
+                OrderLifecycle::Active.into(),
+                Ordering::AcqRel,
+                Ordering::Relaxed,
+            )
+            .is_ok()
     }
 
     /// Enter the finished lifecycle state from active.
     #[inline(always)]
     pub(crate) fn enter_finished_from_active(&self) -> bool {
-        match self.lifecycle.compare_exchange_weak(
-            OrderLifecycle::Active.into(),
-            OrderLifecycle::Finished.into(),
-            Ordering::AcqRel,
-            Ordering::Relaxed,
-        ) {
-            Ok(_) => true,
-            Err(_) => false,
-        }
+        self.lifecycle
+            .compare_exchange_weak(
+                OrderLifecycle::Active.into(),
+                OrderLifecycle::Finished.into(),
+                Ordering::AcqRel,
+                Ordering::Relaxed,
+            )
+            .is_ok()
     }
 
     /// Enter the finished lifecycle state from matched.
     #[inline(always)]
     pub(crate) fn enter_finished_from_matched(&self) -> bool {
-        match self.lifecycle.compare_exchange_weak(
-            OrderLifecycle::Matched.into(),
-            OrderLifecycle::Finished.into(),
-            Ordering::AcqRel,
-            Ordering::Relaxed,
-        ) {
-            Ok(_) => true,
-            Err(_) => false,
-        }
+        self.lifecycle
+            .compare_exchange_weak(
+                OrderLifecycle::Matched.into(),
+                OrderLifecycle::Finished.into(),
+                Ordering::AcqRel,
+                Ordering::Relaxed,
+            )
+            .is_ok()
     }
 
     /// Get the order priority of the order book.
@@ -488,6 +485,7 @@ impl Order {
     /// SAFETY:
     /// Only the matching engine thread modifies cancel_reason,
     /// ensuring safe access under shared reference.
+    #[allow(dead_code)]
     #[inline(always)]
     pub(crate) fn update_cancel_reason(&self, reason: CancelReason) {
         unsafe {
@@ -512,9 +510,7 @@ impl Order {
     /// For 'Sell' orders, the lowest price.
     /// Returns `None` if no slippage tolerance is set.
     pub fn slippage_bound_price(&self, price: Price) -> Option<Price> {
-        if self.slippage_tolerance.is_none() {
-            return None;
-        }
+        self.slippage_tolerance?;
 
         let slippage = self.slippage_tolerance.unwrap();
         let mut factor = U512::from(slippage.0);
