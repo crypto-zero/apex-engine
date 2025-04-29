@@ -24,7 +24,7 @@ pub trait OrderBook {
     /// Get the book
     fn get_book(&self, side: Side) -> &SkipList<BookKey, Order>;
     /// Sync orders that's matched and trades
-    fn sync_matched(&self, updated: &Vec<Order>, trades: &Vec<Trade>);
+    fn sync_matched(&self, updated: &[Order], trades: &[Trade]);
 }
 
 /// WalkingResult is used for match engine walking results
@@ -239,7 +239,7 @@ impl OrderBook for DefaultOrderBook {
         order_entry.remove();
         order_index.remove(&order_id);
         let id = self.id.fetch_add(1, Ordering::Acquire);
-        self.syncer.cancel_order(id, &book_order);
+        self.syncer.cancel_order(id, book_order);
 
         Ok(())
     }
@@ -251,10 +251,7 @@ impl OrderBook for DefaultOrderBook {
             Side::Buy => self.buy_orders.front(guard),
             Side::Sell => self.sell_orders.front(guard),
         };
-        match entry {
-            Some(entry) => Some(entry.key().price),
-            None => None,
-        }
+        entry.map(|entry| entry.key().price)
     }
 
     fn get_book(&self, side: Side) -> &SkipList<BookKey, Order> {
@@ -265,7 +262,7 @@ impl OrderBook for DefaultOrderBook {
     }
 
     /// Sync orders that are matched and trades
-    fn sync_matched(&self, updated: &Vec<Order>, trades: &Vec<Trade>) {
+    fn sync_matched(&self, updated: &[Order], trades: &[Trade]) {
         let id = self.id.fetch_add(1, Ordering::Acquire);
         self.syncer.matched(id, updated, trades);
     }
@@ -363,14 +360,16 @@ impl MatchingEngineWalker for DefaultOrderBook {
                         continue;
                     }
 
-                    let taker = if buy_maker_only && !sell_maker_only {
-                        sell_order
-                    } else if sell_maker_only && !buy_maker_only {
-                        buy_order
-                    } else if buy_key.priority < sell_key.priority {
-                        buy_order
-                    } else {
-                        sell_order
+                    let taker = match (buy_maker_only, sell_maker_only) {
+                        (true, false) => sell_order,
+                        (false, true) => buy_order,
+                        _ => {
+                            if buy_key.priority < sell_key.priority {
+                                buy_order
+                            } else {
+                                sell_order
+                            }
+                        }
                     };
                     let taker_is_buy = taker.side == Side::Buy;
 

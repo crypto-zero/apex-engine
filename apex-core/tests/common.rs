@@ -2,21 +2,24 @@ use apex_core::prelude::*;
 use crossbeam::epoch;
 use crossbeam::epoch::default_collector;
 use crossbeam_skiplist::SkipList;
+use std::cell::UnsafeCell;
 
 /// Quickly generate a simple limit order for testing
 pub fn make_limit_order(id: u64, side: Side, price: u64, qty: u64, ts: u64) -> Order {
-    let mut value = Order::default();
-    value.id = id;
-    value.user_id = 1;
-    value.side = side;
-    value.price = Price::from(price);
-    *value.quantity.get_mut() = Quantity::from(qty);
-    value.created_at = ts;
-    value.updated_at = ts;
-    value
+    Order {
+        id,
+        user_id: 1,
+        side,
+        price: Price::from(price),
+        quantity: UnsafeCell::new(Quantity::from(qty)),
+        created_at: ts,
+        updated_at: ts,
+        ..Order::default()
+    }
 }
 
 /// Quickly generate a market order for testing
+#[allow(dead_code)]
 pub fn make_market_order(id: u64, side: Side, qty: u64, ts: u64) -> Order {
     let mut value = make_limit_order(id, side, 0, qty, ts);
     value.order_type = OrderType::Market;
@@ -24,6 +27,7 @@ pub fn make_market_order(id: u64, side: Side, qty: u64, ts: u64) -> Order {
 }
 
 /// Get the current state of a side of the book
+#[allow(dead_code)]
 pub fn get_book_state(book: &dyn OrderBookWalker, side: Side) -> Vec<(OrderID, Quantity)> {
     let guard = &epoch::pin();
     book.get_book(side)

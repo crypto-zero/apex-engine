@@ -93,7 +93,7 @@ impl DefaultMatchingEngine {
         self.order_book
             .walking_by_order_id_list(order_id_list.as_slice(), &mut |o| {
                 o.exit_matched();
-                return WalkingResult::next();
+                WalkingResult::next()
             });
         None
     }

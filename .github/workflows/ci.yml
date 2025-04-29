@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - dev-*
   pull_request:
     branches:
       - main
@@ -21,8 +22,7 @@ jobs:
         uses: actions-rs/toolchain@v1
         with:
           toolchain: 1.86.0
-          # components: clippy, rustfmt
-          components: rustfmt
+          components: clippy, rustfmt
 
       - name: Cache Cargo registry
         uses: actions/cache@v4
@@ -48,5 +48,5 @@ jobs:
       - name: Run cargo test
         run: cargo test --workspace --all-targets --no-fail-fast
 
-      # - name: Run cargo clippy
-      #   run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: Run cargo clippy
+        run: cargo clippy --workspace --all-targets -- -D warnings
